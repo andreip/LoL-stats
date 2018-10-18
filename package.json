@@ -2,9 +2,12 @@
   "name": "lol_stats",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "mocha src/*.test.js --require babel-register",
+    "start": "npm run build && node dist/index.js",
+    "prebuild": "rimraf dist",
+    "build": "babel --copy-files --out-dir dist --ignore *.test.js src"
   },
   "author": "Andrei Petre",
   "license": "ISC",
@@ -13,6 +16,15 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "mocha": "^5.2.0"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "mocha": "^5.2.0",
+    "rimraf": "^2.6.2"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
   }
 }

@@ -1,3 +1,4 @@
 *.sw*
 .envrc
 node_modules
+dist
