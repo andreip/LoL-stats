@@ -4,6 +4,8 @@ import { URL } from 'url';
 import express from 'express';
 import request from 'request';
 
+import { FAKE_MATCH } from './fake_data';
+
 
 const LOL_API_KEY = process.env.LOL_API_KEY;
 if (!LOL_API_KEY) {
@@ -30,13 +32,18 @@ app.get('/summoner/:summonerName/most-recent-matches', (req, res) => {
     // TODO: summonerName get it from req.params.
     // and also test that summonerName matches regex, so we don't
     // run anything that user gives.
+    res.json({
+        summonerName: "TF Blade",
+        matches: [FAKE_MATCH]
+    });
+    return;
 
     const url = new URL(matchURI(matchId), baseURI);
     url.searchParams.append('api_key', LOL_API_KEY);
     //console.log("Doing API call to", url.href);
     request(url, {json: true}, (err, res2, body) => {
         if (!err && res2.statusCode == 200) {
-            res.send({
+            res.json({
                 summonerName,
                 matches: [body]
             });
@@ -46,7 +53,7 @@ app.get('/summoner/:summonerName/most-recent-matches', (req, res) => {
             } else {
                 console.log("Got a non-200 response", body);
             }
-            res.send({err: "Request failed."});
+            res.json({err: "Request failed."});
         }
     });
 });
