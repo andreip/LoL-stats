@@ -1,6 +1,14 @@
+import { join } from 'path';
+import { URL } from 'url';
+
 import express from 'express';
 import request from 'request';
-import { URL } from 'url';
+
+
+const LOL_API_KEY = process.env.LOL_API_KEY;
+if (!LOL_API_KEY) {
+    throw new Error("Please setup a valid LOL_API_KEY env variable (https://developer.riotgames.com/).");
+}
 
 const app = express();
 const port = 3000;
@@ -13,7 +21,7 @@ const platformId = 'NA1';
 const summonerName = 'TF Blade';
 
 app.get('/', (req, res) => {
-    res.send("Hello World");
+    res.sendFile(join(__dirname, '/public/index.html'));
 });
 
 app.get('/summoner/:summonerName/most-recent-matches', (req, res) => {
@@ -22,13 +30,22 @@ app.get('/summoner/:summonerName/most-recent-matches', (req, res) => {
     // run anything that user gives.
 
     const url = new URL(matchURI(matchId), baseURI);
-    url.searchParams.append('api_key', process.env.LOL_API_KEY);
+    url.searchParams.append('api_key', LOL_API_KEY);
     //console.log("Doing API call to", url.href);
     request(url, {json: true}, (err, res2, body) => {
-        res.send({
-            summonerName,
-            matches: [body]
-        });
+        if (!err && res2.statusCode == 200) {
+            res.send({
+                summonerName,
+                matches: [body]
+            });
+        } else {
+            if (err) {
+                console.log("Error while fetching", err);
+            } else {
+                console.log("Got a non-200 response", body);
+            }
+            res.send({err: "Request failed."});
+        }
     });
 });
 
