@@ -20,6 +20,8 @@ const matchId = 2888919284;
 const platformId = 'NA1';
 const summonerName = 'TF Blade';
 
+app.use(express.static(join(__dirname, 'public')));
+
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, '/public/index.html'));
 });
