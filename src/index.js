@@ -22,7 +22,7 @@ const maxRecentGames = 5;  // number of most games to fetch
 
 
 class App {
-    constructor(port=3000) {
+    constructor(port = process.env.PORT || 3000) {
         this.port = port;
         this.app = express();
         this.app.use(express.static(join(__dirname, 'public')));

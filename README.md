@@ -18,5 +18,8 @@ it looks something like this:
 ```bash
 $ npm install
 $ npm run start
-# head over to localhost:3000
+# and head over to localhost:3000
+
+# running tests
+$ npm t
 ```
