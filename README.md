@@ -8,4 +8,4 @@ You need a LoL valid API key though, get one here https://developer.riotgames.co
 The inspiration was http://na.op.gg/ but it looks no way that cool. Nevertheless,
 it looks something like this:
 
-
+<img src="/src/public/img/screenshot.png" height="500" />
