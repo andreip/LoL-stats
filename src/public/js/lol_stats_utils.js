@@ -1,11 +1,11 @@
 const multiKills = ['doubleKills', 'tripleKills', 'quadraKills', 'pentaKills', 'unrealKills'];
 
-function extractInfoFromMatch(summonerName, match) {
-    const participant = match.participantIdentities.find(p => p.player.summonerName == summonerName);
+function extractInfoFromMatch(accountId, match) {
+    const participant = match.participantIdentities.find(p => p.player.accountId == accountId);
     console.log("Participant", participant);
 
     if (!participant) {
-        console.error(`Something went wrong, couldn't find participant with name ${summonerName}`);
+        console.error(`Something went wrong, couldn't find participant with accountId ${accountId}`);
         return null;
     }
 
@@ -24,7 +24,7 @@ function extractInfoFromMatch(summonerName, match) {
         {text: "Game Id", value: match.gameId},
         {text: "Outcome", value: stats.win},
         {text: "Duration", value: match.gameDuration},
-        {text: "Summoner Name", value: summonerName},
+        {text: "Summoner Name", value: participant.player.summonerName},
         {text: "First Summoner Spell", value: participantInfo.spell1Id},
         {text: "Second Summoner Spell", value: participantInfo.spell2Id},
         {
@@ -32,7 +32,7 @@ function extractInfoFromMatch(summonerName, match) {
             value: R.pipe(
                 R.pickBy((v, k) => R.test(/^perk\d$/, k)),
                 R.values,
-                R.filter(R.empty),
+                R.filter(v => v > 0),
             )(stats)
         },
         {text: "Champion Id", value: participantInfo.championId},
@@ -43,7 +43,7 @@ function extractInfoFromMatch(summonerName, match) {
             value: R.pipe(
                 R.pickBy((v, k) => R.test(/^item\d$/, k)),
                 R.values,
-                R.filter(R.empty),
+                R.filter(v => v > 0),
             )(stats)
         },
         {

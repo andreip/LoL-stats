@@ -16,12 +16,12 @@ const SearchForm = ({ doSearch }) => {
     );
 };
 
-const LoLMatch = ({ summonerName, ...match }) => {
+const LoLMatch = ({ accountId, summonerName, ...match }) => {
 
     let info = R.pipe(
         extractInfoFromMatch,
         prettifyMatchValues
-    )(summonerName, match);
+    )(accountId, match);
 
     if (!info) {
         console.error(`Something went wrong, we got no info for ${summonerName}`);
@@ -38,9 +38,12 @@ const LoLMatch = ({ summonerName, ...match }) => {
         );
     });
 
+    const outcomeEntry = R.find(R.propEq('text', 'Outcome'), info);
+    console.log("outcome", outcomeEntry);
+
     return (
         <li>
-            <table>
+            <table className={outcomeEntry.pretty}>
                 <tbody>
                     {tableRows}
                 </tbody>
@@ -49,10 +52,10 @@ const LoLMatch = ({ summonerName, ...match }) => {
     );
 };
 
-const LoLTitle = ({ name }) => {
+const LoLTitle = ({ name, n }) => {
     if (name) {
         return (
-            <h2>Matches for {name}</h2>
+            <h2>Most recent {n} matches for {name}</h2>
         );
     } else {
         return (
@@ -61,20 +64,24 @@ const LoLTitle = ({ name }) => {
     }
 };
 
-const LoLMatchList = ({ searching, summonerName, matches }) => {
+const LoLMatchList = ({ searching, summonerName, accountId, matches, err }) => {
+    if (err) {
+        return <h2>{err}</h2>;
+    }
+
     if (searching) {
         return <h2>Searching matches for {summonerName}...</h2>;
     }
 
     const nodes = matches.map((match, idx) => {
         return (
-            <LoLMatch key={idx} summonerName={summonerName} {...match} />
+            <LoLMatch key={idx} accountId={accountId} summonerName={summonerName} {...match} />
         );
     });
 
     return (
         <div>
-            <LoLTitle name={summonerName} />
+            <LoLTitle n={matches.length} name={summonerName} />
             <ul>{nodes}</ul>
         </div>
     );
@@ -85,13 +92,15 @@ class LoLStatsApp extends React.Component {
     super(props);
     this.state = {
         summonerName: '',
+        accountId: null,
         matches: [],
         searching: false,
+        err: null,
     };
   }
 
   doSearch(summonerName) {
-    this.setState({ searching: true, matches: [], summonerName });
+    this.setState({ err: null, searching: true, matches: [], summonerName });
     fetch(`/summoner/${summonerName}/most-recent-matches`)
         .then(resp => resp.json())
         .then(data => {
@@ -99,6 +108,7 @@ class LoLStatsApp extends React.Component {
             this.setState({ searching: false, ...data });
         }).catch(ex => {
           console.log('parsing failed', ex)
+          this.setState({err: `Failed to fetch matches for ${summonerName}`});
         })
   }
 
